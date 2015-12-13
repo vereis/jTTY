@@ -34,19 +34,21 @@ function rss(input, args)
 		{
 			url = 'http://feeds.feedburner.com/tedtalks_video';
 		}
-		else if (args[0] == "")
+		else if (args[0] == "reddit")
 		{
-			url = '';
+			url = 'http://www.reddit.com/.rss';
 		}
 		
 		if (args.length > 1) { pages = args[1]; }
 		
 		$("#rss").attr("class", "rss_Old")
 		$("#rss").attr("id", null);
-		print("-------------------------------------------------------------------------------");
+		
+		drawSeperator(120);
+		print(" ");
 		print(" ");
 			$("#terminal").append("<div id = rss></div>");
-			$("#rss").FeedEk({
+			$("#rss").getRSS({
 				FeedUrl: url,
 				MaxCount : pages,
 				ShowDesc : true,
@@ -54,7 +56,7 @@ function rss(input, args)
 				DescCharacterLimit:100,
 				TitleLinkTarget:'_blank',
 				});
-		print("-------------------------------------------------------------------------------");
+		drawSeperator(120);
 	}
 
 

@@ -53,17 +53,17 @@ p {
 }
 
 //RSS Feed Styling
-.feedEkList{
+.rssFeedList{
     width:450px; 
     list-style:none outside none;
     background-color: transparent; 
     border:0px solid #D3CAD7; 
     margin-left: 16px;
 }
-.feedEkList li {
+.rssFeedList li {
     padding-bottom: 8px;
 }
-.feedEkList li:last-child {
+.rssFeedList li:last-child {
     padding-bottom: 0px !important;
 }
 
@@ -78,7 +78,7 @@ p {
 	color: #888;
 }
 
-.feedEkList a , .itemDate, p ,pre, li{
+.rssFeedList a , .itemDate, p ,pre, li{
     font-family: "Terminus (ttf)", monospace;
     font-size: 12px !important;
     text-decoration: none

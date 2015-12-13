@@ -7,8 +7,6 @@
         <link rel = "stylesheet" type = "text/css" href = "main.css">
 		
 		<script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<script src = "libs/position.js"></script>
-		<script src = "libs/FeedEk.js"></script>
 		
     </head>
     <body>
@@ -18,7 +16,14 @@
 	
 	
 <!-- C O M M A N D S    F O R    T H E    T E R M I N A L -->
-    <script src = "bin/clear.js"></script>
+    <script src = "libs/printLib.js"></script>
+	<script src = "libs/position.js"></script>
+	<script src = "libs/getRSS.js"></script>
+	
+	<script src = "bin/io.js"></script>
+	<script src = "bin/repl.js"></script>
+
+	<script src = "bin/clear.js"></script>
 	<script src = "bin/echo.js"></script>
 	<script src = "bin/about.js"></script>
 	<script src = "bin/help.js"></script>
@@ -41,255 +46,22 @@
         var inputBlock = "<pre id = 'caret'>&#9608;</pre>";
         var postInput = "<div id = 'post'></div>"; 
 
+		var seperatorLength = 4;
+		var seperator = Array(seperatorLength+1).join("-")		
+		
         var tabLength = 4;
         var tab = Array(tabLength+1).join(" ");
-
-
-		// -- USEFUL FUNCTIONS -- //
-
-        function parseInput(input) // Gets the input from #input and tries to read it.
-        {
-			var input2 = "";
-			var childrenLen = $("#post").children().length;
-			$("#post").contents().each(function(i) 	
-			{ 
-				//alert($(".ppost:nth-child(" + (i+1) + ")").text());	
-				//alert($(".ppost:nth-child(" + (childrenLen - i) + ")").text());
-				input2 += $(".ppost:nth-child(" + (i+1) + ")").text()
-			})
-			var combinedInput = input + input2;
-			var standardisedString = combinedInput.replace(/\s\s+/g, " ");           // Remove areas of multiple whitespace
-            var parsedString = standardisedString.trim().split(" ");       // Split the string into several based on whitespace
-            validate(parsedString, input);
-        }
-
-		//------------------------------------------------------------------------------------------------------------------------------------------------------------------/
 		
-        function validate(input, original) // Validates a functions and arguments
-        {
-            var stringLength = input.length - 1; // Empty string beginning and end count too for some reason, lets sanitise
-            var flag = false;
-            
-            //print(stringLength);
-            
-            for (i = 0; i <= COMMAND_LIST.length; i++) // Is the first segment of the input a valid command?
-            {
-                if (COMMAND_LIST[i] == input[0])
-                {
-                    flag = true; // If so, cool
-                }
-            }
+		var loading = "<div id='loading'><p>loading</p><ul><li>.</li><li>.</li><li>.</li></ul></div>"
 
-            if (flag == true) // Depending on the results of the previous test, either proceed here, or below..
-            {
-                if (stringLength > 0) // If there is more than one segment to our input, we'll use em as arguments
-                {
-                    var args = []; 
-
-                    for (i = 1; i <= stringLength; i++)
-                    {
-                        if (input[i] != null) { args[i-1] = input[i]; }  
-                    }
-
-                    evaluate(input[0], args);
-                }
-                else // Otherwise call evaluate without any arguments
-                {
-                    evaluate(input[0], "empty");
-                }
-            }
-            else
-            {
-                var error = "The specified command " + input[0] + " was not recognised as a valid command."
-                print(error);
-                respond("null");
-            }
-        }
-
-		//------------------------------------------------------------------------------------------------------------------------------------------------------------------/
-		
-        function print(output) // Prints something to the console
-        {
-            $("#terminal").append("<br class = 'nl'> <pre class = 'output'>" + output + "</pre>");
-        }
-
-        function evaluate(input, args) // Executes different code depending on input and arguments 
-        {
-            if (input == "clear")
-            {
-                clear();
-            }
-            
-            
-            else if (input == "echo")
-            {
-                echo(args);
-            }
-            
-            else if (input == "about")
-            {
-				about();
-            }
-
-            else if (input == "help") // The loop automatically prints every command with every associated help message
-            {
-				help();
-            }
-            
-            
-            else if (input == "google" || input == "youtube") // These section governs sites you can search
-            {
-				search(input, args);
-            }
-            
-            
-            else if (input == "site" || input == "facebook" || input == "wikipedia") // This just redirects either to a site shorthand such as facebook
-            {
-				redir(input, args);
-            }
-            
-            else if (input == "rss")
-            {
-				rss(input, args);
-			}
-
-        }
-
-		//------------------------------------------------------------------------------------------------------------------------------------------------------------------/
-		
-        function respond(input) // Prints new prompt and input. 
-        {
-            $("#prompt").attr("class", "prompt_Old");
-            $("#prompt").attr("id", null);
-			$("#caret").remove();
-			$("#post").attr("class", "input_Old");
-			$("#post").attr("id", null);
-			$(".input_Old").contents().each(function(i) 	
-			{ 
-				$(".ppost:nth-child(" + (i+1) + ")").attr("class", "input_Old");
-				$(".ppost:nth-child(" + (i+1) + ")").attr("id", null);
-			})
-            $("#input").attr("class", "input_Old");
-            $("#input").attr("id", null);
-            $(".input_Old").attr("contentEditable", "false");
-            if(input == "!br")
-            {
-                $("#terminal").append(promptString + inputString + inputBlock + postInput);
-            }
-            else
-            {
-                $("#terminal").append("<br class = 'nl'>" + promptString + inputString + inputBlock + postInput);
-            }
-            $("#input").focus();
-            resetInput();
-        }
-
-		//------------------------------------------------------------------------------------------------------------------------------------------------------------------/
-		
-        function catchEnter() //Intercepts enter presses when on input
-        {
-            $("#input").keydown(function(e)
-            {   
-                $("#input br").remove();
-                if (e.which == 13)
-                {
-                    parseInput($("#input").text());
-                    return false;
-                }
-            });
-        }
-
-		//------------------------------------------------------------------------------------------------------------------------------------------------------------------/
-		
-        function catchClick() // Intercepts clicks on body
-        {
-            $("body").click(function()
-            {
-               focusEnd();
-            });
-        }
-
-		//------------------------------------------------------------------------------------------------------------------------------------------------------------------/
-		
-        function catchLR()
-        {
-            $("#input").keyup(function(e)
-            {
-                if (e.which == 37 && $("#input").text().length > 0)
-                {
-                    var end = $("#input").length;
-                    var currentText = $("#input").text();
-                    $("#input").remove();
-					$("#prompt").append("<pre id = 'input' contentEditable = 'true'>" + currentText.substring(0, currentText.length-1) + "</pre>");
-					focusEnd();
-                    $("#post").prepend("<pre class = 'ppost'>" + currentText.substring(currentText.length-1, currentText.length) + "</pre>");
-                    
-					setTimeout(10,resetInput());
-					
-                    return false;
-                }
-                else if (e.which == 39)
-                {
-                    var currentText = $("#input").text();
-                    var newText = currentText + $(".ppost:first-child").text();
-                    $("#input").remove();
-                    $("#prompt").append("<pre id = 'input' contentEditable = 'true'>" + newText + "</pre>");
-					focusEnd();
-                    $(".ppost:first-child").remove();
-
-                    setTimeout(10,resetInput());
-					
-                    return false;
-                }
-				else if (e.which == 46)
-				{
-					var childrenLen = $("#post").children().length;
-					if (childrenLen < 1)
-					{
-						var end = $("#input").length;
-						var currentText = $("#input").text();
-						$("#input").remove();
-						$("#prompt").append("<pre id = 'input' contentEditable = 'true'>" + currentText.substring(0, currentText.length-1) + "</pre>");
-						focusEnd();
-						setTimeout(10,resetInput());
-					}
-					else
-					{
-						$(".ppost:first-child").remove();
-                    }
-					return false;
-				}
-            });
-        }
-		
-		//------------------------------------------------------------------------------------------------------------------------------------------------------------------/
-		
-		function focusEnd()
-		{
-			$("#input").focus();
-			var editableDiv = document.getElementById("input");
-			cursorManager.setEndOfContenteditable(editableDiv);
-		}
-
-		//------------------------------------------------------------------------------------------------------------------------------------------------------------------/
-		
-		function resetInput()
-		{
-			catchEnter();
-            catchClick();
-            catchLR();
-		}
-		
-		//------------------------------------------------------------------------------------------------------------------------------------------------------------------/
-		
-		
 		
 		// -- ACTUAL RUNNING CODE BELOW -- //
 
 
-        $(document).ready(function() {
-            print("The font Terminus (TTF) is highly recommended, though attempts have been made to not be overly dependent on this.")
+        $(document).ready(function() {	
+			print("The font Terminus (TTF) is highly recommended, though attempts have been made to not be overly dependent on this.");
 			print("<p><i>Version 2; test release. Please email suggestions to 6c556d22b7@outlook.com~</i></p>");
+			
 			$("#terminal").append("<br>" + promptString + inputString + inputBlock + postInput);
             $("#input").focus();
 			resetInput();
@@ -318,5 +90,6 @@
 						 "Prints the current location", 
 						 "Gets an RSS feed. Arg 1 = Source, Arg 2 = number of results",
 						 ];
+						 
     </script>
 </html>
