@@ -1,9 +1,6 @@
 * {
     box-sizing: border-box;
 }
-img {
-    display: none;
-}
 body {
     position: absolute;
     height: 100%;
@@ -14,6 +11,12 @@ body {
 }
 p {
     display: inline;
+}
+#terminal {
+    overflow-y: auto;
+    overflow-x: hidden;
+    color: #BBB;
+    top: -13px;
 }
 #prompt, #input, .output, .prompt_Old, .input_Old, #caret, .ppost, #post{
     display: inline;
@@ -26,12 +29,6 @@ p {
 #input br {
     display: none;
 }
-#terminal {
-    overflow-y: auto;
-    overflow-x: hidden;
-    color: #BBB;
-    top: -13px;
-}
 .output {
     color: #777;
 }
@@ -39,6 +36,8 @@ p {
     position: relative;
     margin-left: -6px;
 }
+
+//Cursor Styling
 #caret {
     animation: blink 1s steps(2, start) infinite;
 }
@@ -66,9 +65,6 @@ p {
 .rssFeedList li:last-child {
     padding-bottom: 0px !important;
 }
-
-//Items inside each RSS item
-
 .itemTitle a:hover{ 
     text-decoration: none;
 }
@@ -89,6 +85,7 @@ p {
     text-decoration: none 
 }
 
+//Loading animation
 #loading {
     padding-top: 100px;
 }
