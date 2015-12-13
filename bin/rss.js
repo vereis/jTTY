@@ -61,7 +61,6 @@ function rss(input, args)
 		
 		drawSeperator(120);
 		print(" ");
-		print(" ");
 			$("#terminal").append("<div id = rss></div>");
 			$("#rss").getRSS({
 				FeedUrl: url,

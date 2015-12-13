@@ -13,5 +13,5 @@ function drawSeperator(i)
 {
 	seperatorLength = i;
 	seperator = Array(seperatorLength+1).join("-");
-	$("#terminal").append("<br id='nl'><br id='nl'> <pre class = 'output'>" + seperator + "</pre>");
+	$("#terminal").append("<br id='nl'> <pre class = 'output'>" + seperator + "</pre>");
 }
