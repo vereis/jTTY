@@ -1,5 +1,5 @@
-# jterm
-A relatively function javaScript/jQuery terminal.
+# jsh
+A relatively function javaScript/jQuery terminal/shell.
 
 Currently supports:
   - Caret movement
