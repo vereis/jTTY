@@ -1,0 +1,131 @@
+* {
+    box-sizing: border-box;
+}
+img {
+    display: none;
+}
+body {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: #333;
+    padding-left: 13px;
+    top: -13px;
+}
+p {
+    display: inline;
+}
+#prompt, #input, .output, .prompt_Old, .input_Old, #caret, .ppost, #post{
+    display: inline;
+    font-family: "Terminus (ttf)", monospace;
+    font-size: 12px;
+    outline: none;
+    text-decoration: none;
+    width: 0;
+}
+#input br {
+    display: none;
+}
+#terminal {
+    overflow-y: auto;
+    overflow-x: hidden;
+    color: #BBB;
+    top: -13px;
+}
+.output {
+    color: #777;
+}
+#post {
+    position: relative;
+    margin-left: -6px;
+}
+#caret {
+    animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+#input {
+    color: transparent;
+    text-shadow: 0px 0px 0px #BBB;
+}
+
+//RSS Feed Styling
+.feedEkList{
+    width:450px; 
+    list-style:none outside none;
+    background-color: transparent; 
+    border:0px solid #D3CAD7; 
+    margin-left: 16px;
+}
+.feedEkList li {
+    padding-bottom: 8px;
+}
+.feedEkList li:last-child {
+    padding-bottom: 0px !important;
+}
+
+//Items inside each RSS item
+
+.itemTitle a:hover{ 
+    text-decoration: none;
+}
+
+.itemContent {
+    padding-left: 30px;
+	color: #888;
+}
+
+.feedEkList a , .itemDate, p ,pre, li{
+    font-family: "Terminus (ttf)", monospace;
+    font-size: 12px !important;
+    text-decoration: none
+}
+
+.itemTitle a{
+    color:#BBB !important; 
+    text-decoration: none 
+}
+
+#loading {
+    padding-top: 100px;
+}
+#loading ul, #loading ul li {
+    display: inline;
+    visibility: hidden;
+}
+#loading ul li:nth-child(1){
+    animation: dot 2s infinite;
+}
+#loading ul li:nth-child(2){
+    animation: dot2 2s infinite;
+}
+#loading ul li:nth-child(3){
+    animation: dot3 2s infinite;
+}
+@keyframes dot {
+    0% {visibility: hidden;}
+    20% {visibility: hidden;}
+    40% {visibility: visible;}
+    60% {visibility: visible;}
+    80% {visibility: visible;}
+    100% {visibility: visible;}
+}
+@keyframes dot2 {
+    0% {visibility: hidden;}
+    20% {visibility: hidden;}
+    40% {visibility: hidden;}
+    60% {visibility: visible;}
+    80% {visibility: visible;}
+    100% {visibility: visible;}
+}
+@keyframes dot3 {
+    0% {visibility: hidden;}
+    20% {visibility: hidden;}
+    40% {visibility: hidden;}
+    60% {visibility: hidden;}
+    80% {visibility: visible;}
+    100% {visibility: visible;}
+}
