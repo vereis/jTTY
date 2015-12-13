@@ -13,9 +13,10 @@ function parseInput(input) // Gets the input from #input and tries to read it.
 		//alert($(".ppost:nth-child(" + (childrenLen - i) + ")").text());
 		input2 += $(".ppost:nth-child(" + (i+1) + ")").text()
 	})
+	var doubleDash = "--";
 	var combinedInput = input + input2;
-	var standardisedString = combinedInput.replace(/\s\s+/g, " ");           // Remove areas of multiple whitespace
-	var parsedString = standardisedString.trim().split(" ");       // Split the string into several based on whitespace
+	var standardisedString = combinedInput.replace(/\s\s+/g, " ") && combinedInput.replace(doubleDash,"");		// Remove areas of multiple whitespace and also removes dashes
+	var parsedString = standardisedString.trim().split(" ");		// Split the string into several based on whitespace
 	validate(parsedString, input);
 }
 
