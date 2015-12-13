@@ -33,7 +33,7 @@ $.fn.getRSS = function (opt)
 				if (def.ShowPubDate)
 				{
 					dt = new Date(itm.channel.item.pubDate);
-					s += '<div class="itemDate">';
+					s += '<pre class="itemDate">';
 					if ($.trim(def.DateFormat).length > 0) 
 					{
 						try { moment.lang(def.DateFormatLang); s += moment(dt).format(def.DateFormat); }
