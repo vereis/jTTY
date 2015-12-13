@@ -3,8 +3,17 @@
 * Author : Vereis~
 */
 
-function clear()
+function clear(args)
 {
-    $("#terminal .nl, p, pre, .input_Old, #rss, rss_Old, li, ul").remove(); // Clear the screen
+    var helpDesc = ["This function clears the current terminal and repopulates it."];
+	
+	if (args[0] == "help")
+	{
+		print(printHelp(helpDesc));
+	}
+	else
+	{
+		$("#terminal .nl, p, pre, .input_Old, #rss, rss_Old, li, ul").remove(); // Clear the screen
+	}
     respond("!br"); // We don't want a newline
 }

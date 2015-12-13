@@ -5,6 +5,8 @@
 
 function echo(args)
 {
+	var helpDesc = ["This isnt accessible anyway"];
+	
 	if (args == "empty")
     {
         print("''"); // If no argument was given, don't echo anything

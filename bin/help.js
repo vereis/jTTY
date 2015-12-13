@@ -3,16 +3,26 @@
 * Author : Vereis~
 */
 
-function help()
+function help(args)
 {
-	print("Below are the list of commands recognised by the system:");
-	//print("");
-	for (i = 0; i != COMMAND_LIST.length; i++)
+	var helpDesc = ["Prints a description of every command"];
+	
+	if (args[0] == "help")
 	{
-		var customTab = Array(((tabLength*5)+1) - COMMAND_LIST[i].length).join(" ");
-		print(tab + COMMAND_LIST[i] + customTab  + HELP_LIST[i]);
+		print(printHelp(helpDesc));
 	}
-	print("For more information about these tools, you can try typing help with the command as an argument");
-	print("");
+	else
+	{
+		print("Below are the list of commands recognised by the system:");
+		//print("");
+		for (i = 0; i != COMMAND_LIST.length; i++)
+		{
+			var customTab = Array(((tabLength*5)+1) - COMMAND_LIST[i].length).join(" ");
+			print(tab + COMMAND_LIST[i] + customTab  + HELP_LIST[i]);
+		}
+		print("For more information about these tools, you can try typing command --help");
+		print("");
+	}
+
 	respond();
 }

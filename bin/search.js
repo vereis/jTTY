@@ -6,7 +6,7 @@
 function search(input, args)
 {
 	if (input == "google") // This if/else tree generates pre-query urls
-	{
+	{	
 		var http = "https://www.google.com/search?q=";
 	}
 	else if (input == "youtube")
