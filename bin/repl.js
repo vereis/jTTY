@@ -65,7 +65,7 @@ function evaluate(input, args) // Executes different code depending on input and
 {
 	if (input == "clear")
 	{
-		clear();
+		clear(args);
 	}
 	
 	
@@ -76,12 +76,12 @@ function evaluate(input, args) // Executes different code depending on input and
 	
 	else if (input == "about")
 	{
-		about();
+		about(args);
 	}
 
 	else if (input == "help") // The loop automatically prints every command with every associated help message
 	{
-		help();
+		help(args);
 	}
 	
 	

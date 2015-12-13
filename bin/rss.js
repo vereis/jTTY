@@ -3,25 +3,16 @@
 * Author : Vereis~
 */
 
-function arrayLoop(){
-	var argList = ["weather", "nyaa", "daily", "tech", "ted", "reddit", "help", "version"]
-	argList.sort();
-	var output = ""
-	for (i = 0 ; i < argList.length; i++)
-	{	
-		 output += " [--" + argList[i] + "]"
-	}
-	return output;
-}
-
 function rss(input, args)
 {
+	var helpDesc = ["weather", "nyaa", "daily", "tech", "ted", "reddit", "help", "version"]
+	
 	var pages = 5;
 	var url = '';
 	
 	if (args == "empty" || args[0] == "help")
 	{
-		print("Usage: rss" + arrayLoop());
+		print("Usage: rss" + printHelp(helpDesc, "argList"));
 	}
 	else if (args[0] == "version") 
 	{
