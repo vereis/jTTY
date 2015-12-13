@@ -34,5 +34,6 @@ How to use:
   Please play around! :)
   
   Credits:
-    windelicato; muhh inspirations
-    feedEk for which my rss is based on
+     -  windelicato; muhh inspirations
+    
+     -  feedEk for which my rss is based on
