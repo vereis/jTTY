@@ -77,3 +77,40 @@ function catchLR()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------/
+
+function catchUD()
+{
+	$("#input").keyup(function(e)
+	{
+		if (e.which == 38)
+		{
+			if (historyIndex >= 2)
+			{
+				historyIndex--;
+				$("#input").remove();
+				$("#prompt").append("<pre id = 'input' contentEditable = 'true'>" + historyList[historyIndex] + "</pre>");
+				$(".ppost").remove();
+				focusEnd();
+				setTimeout(10,resetInput());
+			}
+			else
+			{
+			}
+		}
+		else if (e.which == 40)
+		{
+			if (historyIndex < historyList.length-1)
+			{
+				historyIndex++;
+				$("#input").remove();
+				$("#prompt").append("<pre id = 'input' contentEditable = 'true'>" + historyList[historyIndex] + "</pre>");
+				$(".ppost").remove();
+				focusEnd();
+				setTimeout(10,resetInput());
+			}
+			else
+			{
+			}
+		}
+	});
+}

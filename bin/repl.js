@@ -16,6 +16,9 @@ function parseInput(input) // Gets the input from #input and tries to read it.
 	var doubleDash = "--";
 	var combinedInput = input + input2;
 	var standardisedString = combinedInput.replace(/\s\s+/g, " ") && combinedInput.replace(doubleDash,"");		// Remove areas of multiple whitespace and also removes dashes
+		historyList.push(standardisedString);
+		historyList[0] = historyList.length;
+		historyIndex = historyList[0];
 	var parsedString = standardisedString.trim().split(" ");		// Split the string into several based on whitespace
 	validate(parsedString, input);
 }
@@ -144,4 +147,5 @@ function resetInput()
 	catchEnter();
 	catchClick();
 	catchLR();
+	catchUD();
 }
