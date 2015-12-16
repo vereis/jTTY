@@ -108,8 +108,13 @@ function catchUD()
 				focusEnd();
 				setTimeout(10,resetInput());
 			}
-			else
+			else if (historyIndex == historyList.length-1)
 			{
+				$("#input").remove();
+				$("#prompt").append("<pre id = 'input' contentEditable = 'true'></pre>");
+				$(".ppost").remove();
+				focusEnd();
+				setTimeout(10,resetInput());
 			}
 		}
 	});
