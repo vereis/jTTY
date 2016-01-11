@@ -6,8 +6,8 @@ body {
     height: 100%;
     width: 100%;
     background: #333;
-    padding-left: 13px;
-    top: -13px;
+    padding-left: 2ex;
+    top: -2ex;
 }
 p {
     display: inline;
@@ -16,12 +16,12 @@ p {
     overflow-y: auto;
     overflow-x: hidden;
     color: #BBB;
-    top: -13px;
+    top: -2ex;
 }
 #prompt, #input, .output, .prompt_Old, .input_Old, #caret, .ppost, #post{
     display: inline;
-    font-family: "Terminus (ttf)", monospace;
-    font-size: 12px;
+    font-family: "Sazanami Gothic", monospace;
+    font-size: 8pt;
     outline: none;
     text-decoration: none;
     width: 0;
@@ -34,15 +34,18 @@ p {
 }
 #post {
     position: relative;
-    margin-left: -6px;
+    margin-left: -5px;
 }
 
-//Cursor Styling
 #caret {
-    animation: blink 1s steps(2, start) infinite;
+    font-size: 7pt;
+	animation: blink 0.8s steps(2, start) infinite;
 }
 @keyframes blink {
-    to {
+    0% {
+		visibility: block;
+	}
+	50% {
         visibility: hidden;
     }
 }
@@ -51,32 +54,31 @@ p {
     text-shadow: 0px 0px 0px #BBB;
 }
 
-//RSS Feed Styling
 .rssFeedList{
     width:450px; 
     list-style:none outside none;
     background-color: transparent; 
     border:0px solid #D3CAD7; 
-    margin-left: 16px;
+    margin-left: 3ex;
 }
 .rssFeedList li {
-    padding-bottom: 8px;
+    padding-bottom: 1ex;
 }
 .rssFeedList li:last-child {
-    padding-bottom: 0px !important;
+    padding-bottom: 0ex !important;
 }
 .itemTitle a:hover{ 
     text-decoration: none;
 }
 
 .itemContent {
-    padding-left: 30px;
+    padding-left: 4ex;
 	color: #888;
 }
 
 .rssFeedList a , .itemDate, p ,pre, li{
-    font-family: "Terminus (ttf)", monospace;
-    font-size: 12px !important;
+    font-family: "Sazanami Gothic", monospace;
+    font-size: 8pt;
     text-decoration: none
 }
 
@@ -85,9 +87,9 @@ p {
     text-decoration: none 
 }
 
-//Loading animation
+
 #loading {
-    padding-top: 100px;
+    padding-top: 12px;
 }
 #loading ul, #loading ul li {
     display: inline;

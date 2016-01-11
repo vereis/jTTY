@@ -38,9 +38,9 @@
 
         // -- CONSTANTS N SUCH -- //
 
-        var username = "Vereis";
-        var host = "Celeste";
-        var cd = "~";
+        var username = "Pink";
+        var host = "Nightly";
+        var cd = "/jsh";
         var promptString = "<p id = 'prompt' >" + username + "@" + host + "[" + cd + "]: </p>";
         var inputString = "<pre id  = 'input' contentEditable = 'true'></pre>";
         var inputBlock = "<pre id = 'caret'>&#9608;</pre>";
@@ -59,8 +59,8 @@
 
 
         $(document).ready(function() {	
-			print("The font Terminus (TTF) is highly recommended, though attempts have been made to not be overly dependent on this.");
-			print("<p><i>Version 2; test release. Please email suggestions to 6c556d22b7@outlook.com~</i></p>");
+			print("The font 'Sazayama Gothic' is highly recommended, though attempts have been made to not be overly dependent on this.");
+			print("<p><i>Version 3; test release. Please email suggestions to 6c556d22b7@outlook.com~</i></p>");
 			
 			$("#terminal").append("<br>" + promptString + inputString + inputBlock + postInput);
             $("#input").focus();
@@ -74,7 +74,7 @@
 		var COMMAND_LIST = ["echo", "clear", "help", "google", 
 							"facebook", "youtube", "site", "about", 
 							"wikipedia", "cd", "ls", "pwd", 
-							"rss"
+							"rss", "discord", "addons",
 						   ];
         
         var HELP_LIST = ["The console prints out the arguments to this function", 
@@ -89,7 +89,7 @@
                          "Shows files in current location", 
 						 "Prints the current location", 
 						 "Gets an RSS feed. Arg 1 = Source, Arg 2 = number of results",
-						 ];
+						 "Redirects to Discord IRC", "Shows addon page"];
 						 
 		var historyList = [0,];
 		

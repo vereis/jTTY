@@ -94,7 +94,7 @@ function evaluate(input, args) // Executes different code depending on input and
 	}
 	
 	
-	else if (input == "site" || input == "facebook" || input == "wikipedia") // This just redirects either to a site shorthand such as facebook
+	else if (input == "site" || input == "facebook" || input == "wikipedia" || input == "discord" || input == "preferences") // This just redirects either to a site shorthand such as facebook
 	{
 		redir(input, args);
 	}

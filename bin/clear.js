@@ -13,7 +13,7 @@ function clear(args)
 	}
 	else
 	{
-		$("#terminal .nl, p, pre, .input_Old, #rss, rss_Old, li, ul").remove(); // Clear the screen
+		$("#terminal .nl, p, pre, .input_Old, #rss, .rss_Old, li, ul, #nl").remove(); // Clear the screen
 	}
     respond("!br"); // We don't want a newline
 }
