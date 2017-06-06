@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>JSH Test</title>
+        <style type="text/css">
+            html {
+                height: 100%;
+            }
+
+            body {
+                height: 100%;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .jsh-term {
+                height: 100%;
+                width: 100%;
+            }
+
+            .jsh-term > .jsh-display {
+                background-color: #222;
+                color: #FAFAFA;
+                font-family: monospace;
+                display: inline-block;
+                height: 100%;
+                width: 100%;
+                border: none;
+                outline: none;
+                margin: 0;
+                padding: 0;
+                white-space: pre-wrap;       /* Since CSS 2.1 */
+                white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+                white-space: -pre-wrap;      /* Opera 4-6 */
+                white-space: -o-pre-wrap;    /* Opera 7 */
+                word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            }
+
+            .jsh-term > .jsh-display .jsh-char[selected='true'] {
+                background-color: #FAFAFA;
+                color: #222;
+            }
+        </style>
+    </head>
+    <body>
+    </body>
+    <script>
+        // Init DOM Objects
+        var jshContainer = document.createElement("div");
+            jshContainer.setAttribute("class", "jsh-term");
+
+        var jshTextBuffer = document.createElement("textarea");
+            jshTextBuffer.setAttribute("class", "jsh-text-buffer");
+
+        var jshDisplay = document.createElement("pre");
+            jshDisplay.setAttribute("class", "jsh-display");
+
+        jshContainer.appendChild(jshTextBuffer);
+        jshContainer.appendChild(jshDisplay);
+        
+        // Listen to key presses and copy the character typed into our "display"
+        jshTextBuffer.addEventListener("input", function(e) {
+            var val = jshTextBuffer.value;
+            jshDisplay.innerHTML = "";
+
+            if (val) {
+                val = val.split("");
+
+                for (var i = 0; i < val.length; i++) {
+                    jshDisplay.appendChild(makeChar(val[i], i, jshTextBuffer));
+                    updateCaretPosition(this);
+                }
+            }
+        });
+
+        // Refresh caret position on keyup to detect things like left or right key presses
+        jshTextBuffer.addEventListener("keydown", function(e) {
+            var self = this;
+            return setTimeout(function() { updateCaretPosition(self); }, 0);
+        });
+
+        function makeChar(char, index, container) {
+            var res = document.createElement("span");
+            res.setAttribute("index", index);
+            res.setAttribute("class", "jsh-char");
+            res.innerHTML = char;
+
+            // Move caret when clicked
+            // Caret's index is one larger than what was passed into this function
+            // because we want to append to a char that has been clicked, not prepend.
+            res.addEventListener("click", function(e) {
+                if (setCaretPosition(container, index + 1)) {
+                    updateCaretPosition(container);
+                }
+            });
+
+            return res;
+        }
+
+        function setCaretPosition(elem, dest) {
+            try {
+                if (elem && elem.value && dest >= 0 && dest <= elem.value.length) {
+                    elem.value = elem.value // dirty hack for get focus AND not have anything highlighted
+
+                    if (elem.createTextRange) {
+                        var range = elem.createTextRange();
+                        range.move('character', dest);
+                        range.select();
+                    }
+                    else {
+                        if (elem.selectionStart >= 0) {
+                            elem.focus();
+                            elem.setSelectionRange(dest, dest);
+                        }
+                        else {
+                            throw "Could not move caret - no methods defined for caret manipulation";
+                        }
+                    }
+                }
+                else {
+                    throw "Could not move caret - Either no elem present or dest was larger than contents of elem";
+                }
+            }
+            catch (e) {
+                console.warn(e);
+                return false;
+            }
+            return true;
+        }
+
+        function updateCaretPosition(elem) {
+            var currentlySelected = elem.selectionStart;
+            var charElem = document.querySelector(".jsh-char[index='" + (currentlySelected - 1) + "']");
+            if (charElem) {
+                charElem.setAttribute("selected", true);
+            }
+
+            var others = document.querySelectorAll(".jsh-char:not([index='" + (currentlySelected - 1) + "'])");
+            if (others) {
+                others.forEach(function(charElem) {
+                    charElem.setAttribute("selected", false);
+                });
+            }
+        }
+
+        // Render
+        document.body.appendChild(jshContainer);
+    </script>
+</html>
