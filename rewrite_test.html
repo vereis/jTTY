@@ -39,9 +39,33 @@
                 word-wrap: break-word;       /* Internet Explorer 5.5+ */
             }
 
-            .jsh-term > .jsh-display .jsh-char[selected='true'] {
+            .jsh-term > .jsh-display .jsh-char {
+                position: relative;
+            }
+
+            /* Caret Rendering CSS */
+            .jsh-term > .jsh-display[selected='true']:empty:after,
+            .jsh-term > .jsh-display[selected='true'] .jsh-char:first-child,
+            .jsh-term > .jsh-display:not([selected='true']) .jsh-char[selected='true'] + .jsh-char,
+            .jsh-term > .jsh-display:not([selected='true']) .jsh-char:last-child[selected='true']:after {
                 background-color: #FAFAFA;
                 color: #222;
+                content: " ";
+                animation: caret-animation 1s step-end infinite;
+                -webkit-animation: caret-animation 1s step-end infinite;
+            }
+
+            @keyframes caret-animation {
+                50% {
+                    background-color: #222;
+                    color: #FAFAFA;
+                }
+            }
+            @-webkit-keyframes caret-animation {
+                50% {
+                    background-color: #222;
+                    color: #FAFAFA;
+                }
             }
         </style>
     </head>
@@ -57,6 +81,7 @@
 
         var jshDisplay = document.createElement("pre");
             jshDisplay.setAttribute("class", "jsh-display");
+            jshDisplay.setAttribute("tabindex", "1");
 
         jshContainer.appendChild(jshTextBuffer);
         jshContainer.appendChild(jshDisplay);
@@ -92,7 +117,7 @@
             // Caret's index is one larger than what was passed into this function
             // because we want to append to a char that has been clicked, not prepend.
             res.addEventListener("click", function(e) {
-                if (setCaretPosition(container, index + 1)) {
+                if (setCaretPosition(container, index)) {
                     updateCaretPosition(container);
                 }
             });
@@ -133,20 +158,38 @@
 
         function updateCaretPosition(elem) {
             var currentlySelected = elem.selectionStart;
+            var charContainer = document.querySelector(".jsh-display");
             var charElem = document.querySelector(".jsh-char[index='" + (currentlySelected - 1) + "']");
-            if (charElem) {
-                charElem.setAttribute("selected", true);
-            }
 
-            var others = document.querySelectorAll(".jsh-char:not([index='" + (currentlySelected - 1) + "'])");
-            if (others) {
-                others.forEach(function(charElem) {
-                    charElem.setAttribute("selected", false);
-                });
+            if (currentlySelected > 0) {
+                charContainer.setAttribute("selected", false);
+
+                // If there isn't a charElem found, then the cursor must be either 0 or elem.length.
+                if (charElem) {
+                    charElem.setAttribute("selected", true);
+                }
+                else {
+                    // Handled in CSS: .jsh-term > .jsh-display .jsh-char:last-child[selected='true']
+                }
+
+                var others = document.querySelectorAll(".jsh-char:not([index='" + (currentlySelected - 1) + "'])");
+                if (others) {
+                    others.forEach(function(charElem) {
+                        charElem.setAttribute("selected", false);
+                    });
+                }
+            }
+            else {
+                charContainer.setAttribute("selected", true);
             }
         }
 
-        // Render
-        document.body.appendChild(jshContainer);
+        function render() {
+            document.body.appendChild(jshContainer);
+            updateCaretPosition(jshTextBuffer, 0);
+        }
+
+        render();
+
     </script>
 </html>
