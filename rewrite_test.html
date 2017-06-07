@@ -133,7 +133,10 @@
             var res = document.createElement("span");
             res.setAttribute("index", index);
             res.setAttribute("class", "jsh-char");
-            res.innerHTML = char;
+
+            // Because of the way the caret works, we need to draw a character. \n produces no character
+            // so we insert a rarely used html entity for a space
+            res.innerHTML = (char === "\n" ? "&hairsp;" : "") + char;
 
             // Move caret when clicked
             // Caret's index is one larger than what was passed into this function
