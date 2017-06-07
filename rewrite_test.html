@@ -19,9 +19,15 @@
             .jsh-term {
                 height: 100%;
                 width: 100%;
+                position: relative;
             }
 
-            .jsh-term > .jsh-display {
+            .jsh-text-buffer {
+                opacity: 0;
+                position: absolute;
+            }
+
+            .jsh-display {
                 background-color: #222;
                 color: #FAFAFA;
                 font-family: monospace;
@@ -37,20 +43,29 @@
                 white-space: -pre-wrap;      /* Opera 4-6 */
                 white-space: -o-pre-wrap;    /* Opera 7 */
                 word-wrap: break-word;       /* Internet Explorer 5.5+ */
+                position: absolute;
             }
 
-            .jsh-term > .jsh-display .jsh-char {
+            .jsh-display .jsh-char {
                 position: relative;
             }
 
             /* Caret Rendering CSS */
-            .jsh-term > .jsh-display[selected='true']:empty:after,
-            .jsh-term > .jsh-display[selected='true'] .jsh-char:first-child,
-            .jsh-term > .jsh-display:not([selected='true']) .jsh-char[selected='true'] + .jsh-char,
-            .jsh-term > .jsh-display:not([selected='true']) .jsh-char:last-child[selected='true']:after {
+            .jsh-display[selected='true']:empty:after,
+            .jsh-display[selected='true'] .jsh-char:first-child,
+            .jsh-display:not([selected='true']) .jsh-char[selected='true'] + .jsh-char,
+            .jsh-display:not([selected='true']) .jsh-char:last-child[selected='true']:after {
                 background-color: #FAFAFA;
                 color: #222;
                 content: " ";
+                animation: inherit;
+                -webkit-animation: inherit;
+            }
+
+            .jsh-text-buffer:focus + .jsh-display[selected='true']:empty:after,
+            .jsh-text-buffer:focus + .jsh-display[selected='true'] .jsh-char:first-child,
+            .jsh-text-buffer:focus + .jsh-display:not([selected='true']) .jsh-char[selected='true'] + .jsh-char,
+            .jsh-text-buffer:focus + .jsh-display:not([selected='true']) .jsh-char:last-child[selected='true']:after {
                 animation: caret-animation 1s step-end infinite;
                 -webkit-animation: caret-animation 1s step-end infinite;
             }
@@ -86,6 +101,13 @@
         jshContainer.appendChild(jshTextBuffer);
         jshContainer.appendChild(jshDisplay);
         
+        // Make clicking on display focus text buffer which is invisible
+        jshDisplay.addEventListener("click", function() {
+            setCaretPosition(jshTextBuffer, jshTextBuffer.value.length);
+            updateCaretPosition(jshTextBuffer);
+            jshTextBuffer.focus();
+        });
+
         // Listen to key presses and copy the character typed into our "display"
         jshTextBuffer.addEventListener("input", function(e) {
             var val = jshTextBuffer.value;
@@ -119,6 +141,7 @@
             res.addEventListener("click", function(e) {
                 if (setCaretPosition(container, index)) {
                     updateCaretPosition(container);
+                    e.stopPropagation();
                 }
             });
 
@@ -146,7 +169,10 @@
                     }
                 }
                 else {
-                    throw "Could not move caret - Either no elem present or dest was larger than contents of elem";
+                    // This case is valid when 0ing the caret position and thus we want to handle this case
+                    if (dest !== 0) {
+                        throw "Could not move caret - Dest was larger than contents of elem";                    
+                    }
                 }
             }
             catch (e) {
