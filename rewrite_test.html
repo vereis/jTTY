@@ -34,6 +34,10 @@
                 white-space: pre;
                 overflow-wrap: normal;
                 overflow-x: scroll;
+
+                opacity: 1;
+                left: 30em;
+                z-index: 1;
             }
 
             .jsh-display {
@@ -47,6 +51,7 @@
                 outline: none;
                 margin: 0;
                 padding: 0;
+
                 white-space: pre-wrap;       /* Since CSS 2.1 */
                 white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
                 white-space: -pre-wrap;      /* Opera 4-6 */
@@ -75,12 +80,19 @@
             .jsh-text-buffer:focus + .jsh-display[selected='true'] .jsh-char:first-child,
             .jsh-text-buffer:focus + .jsh-display:not([selected='true']) .jsh-char[selected='true'] + .jsh-char,
             .jsh-text-buffer:focus + .jsh-display:not([selected='true']) .jsh-char:last-child[selected='true']:after {
+                opacity: 1;
                 background-color: #FAFAFA;
                 color: #222;
                 outline: none;
                 animation: caret-animation 1s step-end infinite;
                 -webkit-animation: caret-animation 1s step-end infinite;
             }
+
+            /* Selection CSS */
+/*            ::selection {
+                background-color: rgba(250, 250, 250, 0.99);
+                color: #222;
+            }*/
 
             @keyframes caret-animation {
                 50% {
@@ -99,6 +111,14 @@
     <body>
     </body>
     <script>
+        var user = {
+            is_dragging: false,
+            drag: {
+                from: null,
+                to: null,
+            }
+        };
+
         // Init DOM Objects
         var jshContainer = document.createElement("div");
             jshContainer.setAttribute("class", "jsh-term");
@@ -114,10 +134,19 @@
         jshContainer.appendChild(jshDisplay);
         
         // Make clicking on display focus text buffer which is invisible
-        jshDisplay.addEventListener("click", function() {
-            setCaretPosition(jshTextBuffer, jshTextBuffer.value.length);
-            updateCaretPosition(jshTextBuffer);
-            jshTextBuffer.focus();
+        // jshDisplay.addEventListener("click", function() {
+        //     setCaretPosition(jshTextBuffer, jshTextBuffer.value.length);
+        //     updateCaretPosition(jshTextBuffer);
+        //     jshTextBuffer.focus();
+        // });
+        
+        jshDisplay.addEventListener("mouseup", function() {
+            if (user.is_dragging) {
+                setCaretPosition(jshTextBuffer, user.drag.from, user.drag.to);
+                user.is_dragging = false;
+                user.drag.from = null;
+                user.drag.to = null;
+            }
         });
 
         // Listen to key presses and copy the character typed into our "display"
@@ -160,23 +189,51 @@
                 }
             });
 
+            // Drag handling - custom selection code
+            res.addEventListener("mousedown", function(e) {
+                user.is_dragging = true;
+                user.drag.from = index;
+                user.drag.to = index;
+            });
+
+            res.addEventListener("mouseover", function(e) {
+                if (user.is_dragging) {
+                    user.drag.to = index;
+                }
+            });
+
             return res;
         }
 
-        function setCaretPosition(elem, dest) {
-            try {
-                if (elem && elem.value && dest >= 0 && dest <= elem.value.length) {
-                    elem.value = elem.value // dirty hack for get focus AND not have anything highlighted
+        function setCaretPosition(elem, destA, destB) {
 
+            function inRange(elem, dest) { 
+                return dest >= 0 && dest <= elem.value.length 
+            };
+
+            if (destB === undefined) {
+                destB = destA;
+            }
+
+            if (destB < destA) {
+                return setCaretPosition(elem, destB, destA);
+            }
+
+            try {
+                if (elem && elem.value && inRange(elem, destA) && (!destB || inRange(elem, destB))) {
+                    elem.value = elem.value // dirty hack for get focus AND not have anything highlighted
                     if (elem.createTextRange) {
                         var range = elem.createTextRange();
-                        range.move('character', dest);
+
+                        range.setStart(destA);
+                        range.setEnd(destB);
+
                         range.select();
                     }
                     else {
                         if (elem.selectionStart >= 0) {
                             elem.focus();
-                            elem.setSelectionRange(dest, dest);
+                            elem.setSelectionRange(destA, destB >= 0 ? destB + 1 : destA + 1, "none");
                         }
                         else {
                             throw "Could not move caret - no methods defined for caret manipulation";
