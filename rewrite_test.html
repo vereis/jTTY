@@ -141,12 +141,19 @@
         // });
         
         jshDisplay.addEventListener("mouseup", function() {
-            if (user.is_dragging) {
+            if (user.is_dragging && user.drag.from !== user.drag.to) {
                 setCaretPosition(jshTextBuffer, user.drag.from, user.drag.to);
-                user.is_dragging = false;
-                user.drag.from = null;
-                user.drag.to = null;
             }
+            else {
+                setCaretPosition(jshTextBuffer, jshTextBuffer.value.length);
+            }
+
+            updateCaretPosition(jshTextBuffer);
+            jshTextBuffer.focus();
+            
+            user.drag.from = null;
+            user.drag.to = null;
+            user.is_dragging = false;
         });
 
         // Listen to key presses and copy the character typed into our "display"
@@ -226,14 +233,19 @@
                         var range = elem.createTextRange();
 
                         range.setStart(destA);
-                        range.setEnd(destB);
+                        range.setEnd(null);
 
                         range.select();
                     }
                     else {
                         if (elem.selectionStart >= 0) {
                             elem.focus();
-                            elem.setSelectionRange(destA, destB >= 0 ? destB + 1 : destA + 1, "none");
+
+                            if (destB !== destA) {
+                                destB++;
+                            }
+
+                            elem.setSelectionRange(destA, destB || destA, "none");
                         }
                         else {
                             throw "Could not move caret - no methods defined for caret manipulation";
@@ -242,7 +254,7 @@
                 }
                 else {
                     // This case is valid when 0ing the caret position and thus we want to handle this case
-                    if (dest !== 0) {
+                    if (destA !== 0 || destB !== 0) {
                         throw "Could not move caret - Dest was larger than contents of elem";                    
                     }
                 }
@@ -255,26 +267,48 @@
         }
 
         function updateCaretPosition(elem) {
-            var currentlySelected = elem.selectionStart;
-            var charContainer = document.querySelector(".jsh-display");
-            var charElem = document.querySelector(".jsh-char[index='" + (currentlySelected - 1) + "']");
+            var currentlySelected = {
+                from: Math.min(elem.selectionStart, elem.selectionEnd), 
+                to: Math.max(elem.selectionStart, elem.selectionEnd)
+            };
 
-            if (currentlySelected > 0) {
+            var charContainer = document.querySelector(".jsh-display");
+
+            if (currentlySelected.from && currentlySelected.to) {
                 charContainer.setAttribute("selected", false);
 
-                // If there isn't a charElem found, then the cursor must be either 0 or elem.length.
-                if (charElem) {
-                    charElem.setAttribute("selected", true);
+                // If only one character is selected, we can rely on CSS selectors to do all the work
+                if (currentlySelected.from === currentlySelected.to) {
+                    var charElem = document.querySelector(".jsh-char[index='" + (currentlySelected.from - 1) + "']");
+
+                    // If there isn't a charElem found, then the cursor must be either 0 or elem.length.
+                    if (charElem) {
+                        charElem.setAttribute("selected", true);
+                    }
+                    else {
+                        // Handled in CSS: .jsh-term > .jsh-display .jsh-char:last-child[selected='true']
+                    }
+
+                    var others = document.querySelectorAll(".jsh-char:not([index='" + (currentlySelected.from - 1) + "'])");
+                    if (others) {
+                        others.forEach(function(charElem) {
+                            charElem.setAttribute("selected", false);
+                        });
+                    }
                 }
                 else {
-                    // Handled in CSS: .jsh-term > .jsh-display .jsh-char:last-child[selected='true']
-                }
-
-                var others = document.querySelectorAll(".jsh-char:not([index='" + (currentlySelected - 1) + "'])");
-                if (others) {
-                    others.forEach(function(charElem) {
-                        charElem.setAttribute("selected", false);
-                    });
+                    var charElems = document.querySelectorAll(".jsh-char");
+                    if (charElems.length) {
+                        for (var i = 0; i < charElems.length; i++) {
+                            var index = parseInt(charElems[i].getAttribute("index")) - 1;
+                            if (index > currentlySelected.from && index < currentlySelected.to) {
+                                charElems[i].setAttribute("selected", true);
+                            }
+                            else {
+                                charElems[i].setAttribute("selected", false);
+                            }
+                        }
+                    }
                 }
             }
             else {
