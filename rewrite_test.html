@@ -35,9 +35,10 @@
                 overflow-wrap: normal;
                 overflow-x: scroll;
 
-                opacity: 1;
+                /* Testing */
+                /*opacity: 1;
                 left: 30em;
-                z-index: 1;
+                z-index: 1;*/
             }
 
             .jsh-display {
@@ -67,8 +68,10 @@
             /* Caret Rendering CSS */
             .jsh-display[selected='true']:empty:after,
             .jsh-display[selected='true'] .jsh-char:first-child,
+            .jsh-display[selected='true'] .jsh-char:not(:first-child)[selected='true'] + .jsh-char,
+            .jsh-display[selected='true'] .jsh-char:first-child[selected='true'] + .jsh-char[selected='true'],
             .jsh-display:not([selected='true']) .jsh-char[selected='true'] + .jsh-char,
-            .jsh-display:not([selected='true']) .jsh-char:last-child[selected='true']:after {
+            .jsh-display .jsh-char:last-child[selected='true']:after {
                 outline: 1px solid #FAFAFA;
                 outline-offset: -1px;
                 content: " ";
@@ -78,8 +81,10 @@
 
             .jsh-text-buffer:focus + .jsh-display[selected='true']:empty:after,
             .jsh-text-buffer:focus + .jsh-display[selected='true'] .jsh-char:first-child,
+            .jsh-text-buffer:focus + .jsh-display[selected='true'] .jsh-char:not(:first-child)[selected='true'] + .jsh-char,
+            .jsh-text-buffer:focus + .jsh-display[selected='true'] .jsh-char:first-child[selected='true'] + .jsh-char[selected='true'],
             .jsh-text-buffer:focus + .jsh-display:not([selected='true']) .jsh-char[selected='true'] + .jsh-char,
-            .jsh-text-buffer:focus + .jsh-display:not([selected='true']) .jsh-char:last-child[selected='true']:after {
+            .jsh-text-buffer:focus + .jsh-display .jsh-char:last-child[selected='true']:after {
                 opacity: 1;
                 background-color: #FAFAFA;
                 color: #222;
@@ -89,10 +94,10 @@
             }
 
             /* Selection CSS */
-/*            ::selection {
-                background-color: rgba(250, 250, 250, 0.99);
+            .jsh-display ::selection {
+                background-color: rgba(230, 230, 230, 0.99);
                 color: #222;
-            }*/
+            }
 
             @keyframes caret-animation {
                 50% {
@@ -133,27 +138,19 @@
         jshContainer.appendChild(jshTextBuffer);
         jshContainer.appendChild(jshDisplay);
         
-        // Make clicking on display focus text buffer which is invisible
-        // jshDisplay.addEventListener("click", function() {
-        //     setCaretPosition(jshTextBuffer, jshTextBuffer.value.length);
-        //     updateCaretPosition(jshTextBuffer);
-        //     jshTextBuffer.focus();
-        // });
-        
         jshDisplay.addEventListener("mouseup", function() {
-            if (user.is_dragging && user.drag.from !== user.drag.to) {
+            if (user.is_dragging) {
                 setCaretPosition(jshTextBuffer, user.drag.from, user.drag.to);
             }
             else {
                 setCaretPosition(jshTextBuffer, jshTextBuffer.value.length);
             }
-
-            updateCaretPosition(jshTextBuffer);
-            jshTextBuffer.focus();
-            
             user.drag.from = null;
             user.drag.to = null;
             user.is_dragging = false;
+
+            updateCaretPosition(jshTextBuffer);
+            jshTextBuffer.focus();
         });
 
         // Listen to key presses and copy the character typed into our "display"
@@ -174,7 +171,7 @@
         // Refresh caret position on keyup to detect things like left or right key presses
         jshTextBuffer.addEventListener("keydown", function(e) {
             var self = this;
-            return setTimeout(function() { updateCaretPosition(self); }, 0);
+            return updateCaretPosition(self);
         });
 
         function makeChar(char, index, container) {
@@ -185,16 +182,6 @@
             // Because of the way the caret works, we need to draw a character. \n produces no character
             // so we insert a rarely used html entity for a space
             res.innerHTML = (char === "\n" ? "&hairsp;" : "") + char;
-
-            // Move caret when clicked
-            // Caret's index is one larger than what was passed into this function
-            // because we want to append to a char that has been clicked, not prepend.
-            res.addEventListener("click", function(e) {
-                if (setCaretPosition(container, index)) {
-                    updateCaretPosition(container);
-                    e.stopPropagation();
-                }
-            });
 
             // Drag handling - custom selection code
             res.addEventListener("mousedown", function(e) {
@@ -267,53 +254,63 @@
         }
 
         function updateCaretPosition(elem) {
-            var currentlySelected = {
-                from: Math.min(elem.selectionStart, elem.selectionEnd), 
-                to: Math.max(elem.selectionStart, elem.selectionEnd)
-            };
+            setTimeout(function() {
+                var currentlySelected = {
+                    from: Math.min(elem.selectionStart, elem.selectionEnd), 
+                    to: Math.max(elem.selectionStart, elem.selectionEnd)
+                };
 
-            var charContainer = document.querySelector(".jsh-display");
+                var charContainer = document.querySelector(".jsh-display");
 
-            if (currentlySelected.from && currentlySelected.to) {
-                charContainer.setAttribute("selected", false);
+                if (currentlySelected.from >= 0 || currentlySelected.to >= 0) {
+                    charContainer.setAttribute("selected", false);
 
-                // If only one character is selected, we can rely on CSS selectors to do all the work
-                if (currentlySelected.from === currentlySelected.to) {
-                    var charElem = document.querySelector(".jsh-char[index='" + (currentlySelected.from - 1) + "']");
+                    // If only one character is selected, we can rely on CSS selectors to do all the work
+                    if (currentlySelected.from === currentlySelected.to) {
+                        var charElem = document.querySelector(".jsh-char[index='" + (currentlySelected.from - 1) + "']");
 
-                    // If there isn't a charElem found, then the cursor must be either 0 or elem.length.
-                    if (charElem) {
-                        charElem.setAttribute("selected", true);
+                        // If there isn't a charElem found, then the cursor must be either 0 or elem.length.
+                        if (charElem) {
+                            charContainer.setAttribute("selected", false);
+                            charElem.setAttribute("selected", true);
+                        }
+                        else {
+                            charContainer.setAttribute("selected", true);
+                        }
+
+                        var others = document.querySelectorAll(".jsh-char:not([index='" + (currentlySelected.from - 1) + "'])");
+                        if (others) {
+                            others.forEach(function(charElem) {
+                                charElem.setAttribute("selected", false);
+                            });
+                        }
                     }
+
+                    // If there were multiple characters selected, we need to select them all and loop through them.
                     else {
-                        // Handled in CSS: .jsh-term > .jsh-display .jsh-char:last-child[selected='true']
-                    }
+                        var charElems = document.querySelectorAll(".jsh-char");
+                        if (charElems.length) {
+                            for (var i = 0; i < charElems.length; i++) {
+                                var index = parseInt(charElems[i].getAttribute("index"));
 
-                    var others = document.querySelectorAll(".jsh-char:not([index='" + (currentlySelected.from - 1) + "'])");
-                    if (others) {
-                        others.forEach(function(charElem) {
-                            charElem.setAttribute("selected", false);
-                        });
-                    }
-                }
-                else {
-                    var charElems = document.querySelectorAll(".jsh-char");
-                    if (charElems.length) {
-                        for (var i = 0; i < charElems.length; i++) {
-                            var index = parseInt(charElems[i].getAttribute("index")) - 1;
-                            if (index > currentlySelected.from && index < currentlySelected.to) {
-                                charElems[i].setAttribute("selected", true);
+                                if (index >= currentlySelected.from - 1 && index < currentlySelected.to - 1) {
+                                    charElems[i].setAttribute("selected", true);
+                                }
+                                else {
+                                    charElems[i].setAttribute("selected", false);
+                                }
+                            }
+
+                            if (currentlySelected.from == 0) {
+                                charContainer.setAttribute("selected", true);
                             }
                             else {
-                                charElems[i].setAttribute("selected", false);
+                                charContainer.setAttribute("selected", false);
                             }
                         }
                     }
                 }
-            }
-            else {
-                charContainer.setAttribute("selected", true);
-            }
+            }, 0);
         }
 
         function render() {
