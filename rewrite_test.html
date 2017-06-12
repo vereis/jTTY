@@ -65,6 +65,14 @@
                 position: relative;
             }
 
+            .jsh-display .jsh-char .hidden {
+                color: transparent;
+                display: inline-block;
+                padding: 0;
+                margin: 0;
+                height: 1px;
+            }
+
             /* Caret Rendering CSS */
             .jsh-display[selected='true']:empty:after,
             .jsh-display[selected='true'] .jsh-char:first-child,
@@ -98,7 +106,7 @@
             .jsh-char[selected='true'] + .jsh-char[selected='true'] + .jsh-char,
             .jsh-display[selected='true'] .jsh-char:first-child[selected='true'],
             .jsh-display ::selection {
-                outline: none !important;
+                outline: none;
                 background-color: rgba(200, 200, 200, 0.99);
                 color: #555;
             }
@@ -120,6 +128,8 @@
     <body>
     </body>
     <script>
+
+
         var user = {
             is_dragging: false,
             drag: {
@@ -185,7 +195,7 @@
 
             // Because of the way the caret works, we need to draw a character. \n produces no character
             // so we insert a rarely used html entity for a space
-            res.innerHTML = (char === "\n" ? "&hairsp;" : "") + char;
+            res.innerHTML = (char === "\n" ? "<span class='hidden'>&crarr;</span>" : "") + char;
 
             // Drag handling - custom selection code
             res.addEventListener("mousedown", function(e) {
