@@ -128,211 +128,239 @@
     <body>
     </body>
     <script>
-
-
-        var user = {
-            is_dragging: false,
-            drag: {
-                from: null,
-                to: null,
-            }
-        };
-
-        // Init DOM Objects
-        var jshContainer = document.createElement("div");
-            jshContainer.setAttribute("class", "jsh-term");
-
-        var jshTextBuffer = document.createElement("textarea");
-            jshTextBuffer.setAttribute("class", "jsh-text-buffer");
-
-        var jshDisplay = document.createElement("pre");
-            jshDisplay.setAttribute("class", "jsh-display");
-            jshDisplay.setAttribute("tabindex", "1");
-
-        jshContainer.appendChild(jshTextBuffer);
-        jshContainer.appendChild(jshDisplay);
-        
-        jshDisplay.addEventListener("mouseup", function() {
-            if (user.is_dragging) {
-                setCaretPosition(jshTextBuffer, user.drag.from, user.drag.to);
-            }
-            else {
-                setCaretPosition(jshTextBuffer, jshTextBuffer.value.length);
-            }
-            user.drag.from = null;
-            user.drag.to = null;
-            user.is_dragging = false;
-
-            updateCaretPosition(jshTextBuffer);
-            jshTextBuffer.focus();
-        });
-
-        // Listen to key presses and copy the character typed into our "display"
-        jshTextBuffer.addEventListener("input", function(e) {
-            var val = jshTextBuffer.value;
-            jshDisplay.innerHTML = "";
-
-            if (val) {
-                val = val.split("");
-
-                for (var i = 0; i < val.length; i++) {
-                    jshDisplay.appendChild(makeChar(val[i], i, jshTextBuffer));
-                    updateCaretPosition(this);
-                }
-            }
-        });
-
-        // Refresh caret position on keyup to detect things like left or right key presses
-        jshTextBuffer.addEventListener("keydown", function(e) {
+        function Terminal() {
             var self = this;
-            return updateCaretPosition(self);
-        });
 
-        function makeChar(char, index, container) {
-            var res = document.createElement("span");
-            res.setAttribute("index", index);
-            res.setAttribute("class", "jsh-char");
+            // Initialise Terminal Instance
+            this.buffer = document.createElement("textarea");
+            this.buffer.setAttribute("class", "jsh-text-buffer");
 
-            // Because of the way the caret works, we need to draw a character. \n produces no character
-            // so we insert a rarely used html entity for a space
-            res.innerHTML = (char === "\n" ? "<span class='hidden'>&crarr;</span>" : "") + char;
+            this.display = document.createElement("pre");
+            this.display.setAttribute("class", "jsh-display");
+            this.display.setAttribute("tabindex", "1");
 
-            // Drag handling - custom selection code
-            res.addEventListener("mousedown", function(e) {
-                user.is_dragging = true;
-                user.drag.from = index;
-                user.drag.to = index;
-            });
+            this.container = document.createElement("div");
+            this.container.setAttribute("class", "jsh-term");
+            this.container.appendChild(this.buffer);
+            this.container.appendChild(this.display);
 
-            res.addEventListener("mouseover", function(e) {
-                if (user.is_dragging) {
-                    user.drag.to = index;
-                }
-            });
-
-            return res;
-        }
-
-        function setCaretPosition(elem, destA, destB) {
-
-            function inRange(elem, dest) { 
-                return dest >= 0 && dest <= elem.value.length 
-            };
-
-            if (destB === undefined) {
-                destB = destA;
+            // Exposed methods
+            this.redraw = function() {
+                return __updateCaretPosition();
             }
 
-            if (destB < destA) {
-                return setCaretPosition(elem, destB, destA);
+            this.attachTo = function(elem) {
+                return elem.appendChild(this.container);
             }
 
-            try {
-                if (elem && elem.value && inRange(elem, destA) && (!destB || inRange(elem, destB))) {
-                    elem.value = elem.value // dirty hack for get focus AND not have anything highlighted
-                    if (elem.createTextRange) {
-                        var range = elem.createTextRange();
-
-                        range.setStart(destA);
-                        range.setEnd(null);
-
-                        range.select();
-                    }
-                    else {
-                        if (elem.selectionStart >= 0) {
-                            elem.focus();
-
-                            if (destB !== destA) {
-                                destB++;
-                            }
-
-                            elem.setSelectionRange(destA, destB || destA, "none");
-                        }
-                        else {
-                            throw "Could not move caret - no methods defined for caret manipulation";
-                        }
-                    }
-                }
-                else {
-                    // This case is valid when 0ing the caret position and thus we want to handle this case
-                    if (destA !== 0 || destB !== 0) {
-                        throw "Could not move caret - Dest was larger than contents of elem";                    
-                    }
-                }
-            }
-            catch (e) {
-                console.warn(e);
+            this.getContents = function() {
+                console.warn("Not yet implemented");
                 return false;
             }
-            return true;
-        }
 
-        function updateCaretPosition(elem) {
-            setTimeout(function() {
-                var currentlySelected = {
-                    from: Math.min(elem.selectionStart, elem.selectionEnd), 
-                    to: Math.max(elem.selectionStart, elem.selectionEnd)
-                };
+            this.setContents = function() {
+                console.warn("Not yet implemented");
+                return false;
+            }
 
-                var charContainer = document.querySelector(".jsh-display");
+            this.getCaretPos = function() {
+                console.warn("Not yet implemented");
+                return false;
+            }
 
-                if (currentlySelected.from >= 0 || currentlySelected.to >= 0) {
-                    charContainer.setAttribute("selected", false);
+            this.setCaretPos = function() {
+                console.warn("Not yet implemented");
+                return false;
+            }
 
-                    // If only one character is selected, we can rely on CSS selectors to do all the work
-                    if (currentlySelected.from === currentlySelected.to) {
-                        var charElem = document.querySelector(".jsh-char[index='" + (currentlySelected.from - 1) + "']");
+            // Attach Event Handlers
+            var user = {
+                is_dragging: false,
+                drag: {
+                    from: null,
+                    to: null,
+                }
+            };
 
-                        // If there isn't a charElem found, then the cursor must be either 0 or elem.length.
-                        if (charElem) {
-                            charContainer.setAttribute("selected", false);
-                            charElem.setAttribute("selected", true);
-                        }
-                        else {
-                            charContainer.setAttribute("selected", true);
-                        }
+            this.display.addEventListener("mouseup", function() {
+                if (user.is_dragging) {
+                    __setCaretPosition(user.drag.from, user.drag.to);
+                } else {
+                    __setCaretPosition(self.buffer.value.length);
+                }
+                user.drag.from = null;
+                user.drag.to = null;
+                user.is_dragging = false;
 
-                        var others = document.querySelectorAll(".jsh-char:not([index='" + (currentlySelected.from - 1) + "'])");
-                        if (others) {
-                            others.forEach(function(charElem) {
-                                charElem.setAttribute("selected", false);
-                            });
-                        }
-                    }
+                __updateCaretPosition(self.buffer);
 
-                    // If there were multiple characters selected, we need to select them all and loop through them.
-                    else {
-                        var charElems = document.querySelectorAll(".jsh-char");
-                        if (charElems.length) {
-                            for (var i = 0; i < charElems.length; i++) {
-                                var index = parseInt(charElems[i].getAttribute("index"));
+                self.buffer.focus();
+            });
 
-                                if (index >= currentlySelected.from - 1 && index < currentlySelected.to - 1) {
-                                    charElems[i].setAttribute("selected", true);
-                                }
-                                else {
-                                    charElems[i].setAttribute("selected", false);
-                                }
-                            }
+            this.buffer.addEventListener("input", function(e) {
+                var val = self.buffer.value;
+                self.display.innerHTML = "";
 
-                            if (currentlySelected.from == 0) {
-                                charContainer.setAttribute("selected", true);
-                            }
-                            else {
-                                charContainer.setAttribute("selected", false);
-                            }
-                        }
+                if (val) {
+                    val = val.split("");
+
+                    for (var i = 0; i < val.length; i++) {
+                        self.display.appendChild(__makeChar(val[i], i, self.buffer));
+                        __updateCaretPosition(self);
                     }
                 }
-            }, 0);
+            });
+
+            this.buffer.addEventListener("keydown", function(e) {
+                return __updateCaretPosition(self.buffer);
+            });
+
+            // Internal Functions
+            function __isNewLine(char) {
+                return char.match("(\r)?\n");
+            } 
+            
+            function __makeChar(char, index) {
+                var r = document.createElement("span");
+                    r.setAttribute("index", index);
+                    r.setAttribute("class", "jsh-char");
+
+                if (__isNewLine(char)) {
+                    r.innerHTML = "<span class='hidden'>&crarr;</span>\n";
+                }
+                else {
+                    r.innerHTML = char;
+                }
+
+                // Drag handling - custom selection code
+                r.addEventListener("mousedown", function(e) {
+                    user.is_dragging = true;
+                    user.drag.from = index;
+                    user.drag.to = index;
+                });
+
+                r.addEventListener("mouseover", function(e) {
+                    if (user.is_dragging) {
+                        user.drag.to = index;
+                    }
+                });
+
+                return r;
+            }
+
+            function __setCaretPosition(a, b) {
+                function inRange(dest) {
+                    return dest >= 0 && dest <= self.buffer.value.length;
+                }
+
+                if (b === undefined) {
+                    b = a;
+                }
+
+                if (b < a) {
+                    return __setCaretPosition(b, a);
+                }
+
+                try {
+                    if (self.buffer.value && inRange(a) && (!b || inRange(b))) {
+
+                        // Dirty hack for focus and no highlighting.
+                        self.buffer.value = self.buffer.value; 
+
+                        if (self.buffer.createTextRange) {
+                            var range = self.buffer.createTextRange();
+
+                            range.setStart(a);
+                            range.setEnd(b || null);
+
+                            range.select();
+                        }
+                        else {
+                            if (self.buffer.selectionStart >= 0) {
+                                self.buffer.focus();
+
+                                if (b !== a) { b++; }
+
+                                self.buffer.setSelectionRange(a, b || a, "none");
+                            }
+                            else {
+                                throw "Could not move caret - no methods defined for caret manipulation";
+                            }
+                        }
+                    }
+                    else {
+                        // This case is valid when 0ing the caret position and thus we want to handle this case
+                        if (a !== 0 || b !== 0) {
+                            throw "Could not move caret - Dest was larger than contents of elem";                    
+                        }
+                    }
+                } 
+                catch(e) {
+                    console.warn(e);
+                    return false;
+                }
+
+                return true;
+            }
+
+            function __updateCaretPosition() {
+                setTimeout(function() {
+                    var currentlySelected = {
+                        from: Math.min(self.buffer.selectionStart, self.buffer.selectionEnd),
+                        to: Math.max(self.buffer.selectionStart, self.buffer.selectionEnd)
+                    };
+
+                    var charContainer = self.container.querySelector(".jsh-display");
+
+                    if (currentlySelected.from >= 0 || currentlySelected.to >= 0) {
+                        charContainer.setAttribute("selected", false);
+
+                        // If only one character is selected, we can rely on CSS selectors to do all the work
+                        if (currentlySelected.from === currentlySelected.to) {
+                            var charElem = self.container.querySelector(".jsh-char[index='" + (currentlySelected.from - 1) + "']");
+
+                            // If there isn't a charElem found, then the cursor must be either 0 or elem.length.
+                            if (charElem) {
+                                charContainer.setAttribute("selected", false);
+                                charElem.setAttribute("selected", true);
+                            } else {
+                                charContainer.setAttribute("selected", true);
+                            }
+
+                            var others = self.container.querySelectorAll(".jsh-char:not([index='" + (currentlySelected.from - 1) + "'])");
+                            if (others) {
+                                others.forEach(function(charElem) {
+                                    charElem.setAttribute("selected", false);
+                                });
+                            }
+                        }
+
+                        // If there were multiple characters selected, we need to select them all and loop through them.
+                        else {
+                            var charElems = self.container.querySelectorAll(".jsh-char");
+                            if (charElems.length) {
+                                for (var i = 0; i < charElems.length; i++) {
+                                    var index = parseInt(charElems[i].getAttribute("index"));
+
+                                    if (index >= currentlySelected.from - 1 && index < currentlySelected.to - 1) {
+                                        charElems[i].setAttribute("selected", true);
+                                    } else {
+                                        charElems[i].setAttribute("selected", false);
+                                    }
+                                }
+
+                                if (currentlySelected.from == 0) {
+                                    charContainer.setAttribute("selected", true);
+                                } else {
+                                    charContainer.setAttribute("selected", false);
+                                }
+                            }
+                        }
+                    }
+                }, 0);
+            };
         }
 
-        function render() {
-            document.body.appendChild(jshContainer);
-            updateCaretPosition(jshTextBuffer, 0);
-        }
-
-        render();
-
+        var example = new Terminal().attachTo(document.body);
     </script>
 </html>
