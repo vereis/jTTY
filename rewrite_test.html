@@ -85,18 +85,22 @@
             .jsh-text-buffer:focus + .jsh-display[selected='true'] .jsh-char:first-child[selected='true'] + .jsh-char[selected='true'],
             .jsh-text-buffer:focus + .jsh-display:not([selected='true']) .jsh-char[selected='true'] + .jsh-char,
             .jsh-text-buffer:focus + .jsh-display .jsh-char:last-child[selected='true']:after {
+                outline: none;
                 opacity: 1;
                 background-color: #FAFAFA;
                 color: #222;
-                outline: none;
                 animation: caret-animation 1s step-end infinite;
                 -webkit-animation: caret-animation 1s step-end infinite;
             }
 
             /* Selection CSS */
+            .jsh-char[selected='true'] + .jsh-char[selected='true'],
+            .jsh-char[selected='true'] + .jsh-char[selected='true'] + .jsh-char,
+            .jsh-display[selected='true'] .jsh-char:first-child[selected='true'],
             .jsh-display ::selection {
-                background-color: rgba(230, 230, 230, 0.99);
-                color: #222;
+                outline: none !important;
+                background-color: rgba(200, 200, 200, 0.99);
+                color: #555;
             }
 
             @keyframes caret-animation {
