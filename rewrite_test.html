@@ -154,50 +154,46 @@
 
             // Exposed methods
             this.redraw = function() {
-                return __updateCaretPosition();
+                return __renderDisplay() && __updateCaretPosition();
             }
 
             this.attachTo = function(elem) {
-                return elem.appendChild(this.container);
+                return elem.appendChild(self.container);
             }
 
             this.getContents = function() {
-                console.warn("Not yet implemented");
-                return false;
+                return self.buffer.value;
             }
 
-            this.setContents = function() {
-                console.warn("Not yet implemented");
-                return false;
+            this.setContents = function(contents) {
+                if (contents === undefined || contents === null) {
+                    return self.deleteContents();
+                }
+
+                self.buffer.value = contents;
+                return __renderDisplay() && __updateCaretPosition();
+            }
+
+            this.appendContents = function(contents) {
+                self.buffer.value += contents;
+                return __renderDisplay() && __updateCaretPosition();
+            }
+
+            this.deleteContents = function() {
+                self.buffer.value = "";
+                return __renderDisplay() && __updateCaretPosition();
             }
 
             this.getCaretPos = function() {
-                console.warn("Not yet implemented");
-                return false;
+                return __getCaretPosition();
             }
 
-            this.setCaretPos = function() {
-                console.warn("Not yet implemented");
-                return false;
+            this.setCaretPos = function(from, to) {
+                return __setCaretPosition(from, to) && __renderDisplay() && __updateCaretPosition();
             }
 
-            // Attach Event Handlers --------------------------------------------------------------
-            this.display.addEventListener("mouseup", function() {
-                if (state.is_dragging) {
-                    __setCaretPosition(state.drag.from, state.drag.to);
-                } else {
-                    __setCaretPosition(self.buffer.value.length);
-                }
-                state.drag.from = null;
-                state.drag.to = null;
-                state.is_dragging = false;
-
-                __updateCaretPosition(self.buffer);
-
-                self.buffer.focus();
-            });
-
-            this.buffer.addEventListener("input", function(e) {
+            // Internal Functions -----------------------------------------------------------------
+            function __renderDisplay() {
                 var val = self.buffer.value;
                 self.display.innerHTML = "";
 
@@ -209,13 +205,8 @@
                         __updateCaretPosition(self);
                     }
                 }
-            });
+            }
 
-            this.buffer.addEventListener("keydown", function(e) {
-                return __updateCaretPosition(self.buffer);
-            });
-
-            // Internal Functions -----------------------------------------------------------------
             function __isNewLine(char) {
                 return char.match("(\r)?\n");
             } 
@@ -305,10 +296,7 @@
 
             function __updateCaretPosition() {
                 setTimeout(function() {
-                    var currentlySelected = {
-                        from: Math.min(self.buffer.selectionStart, self.buffer.selectionEnd),
-                        to: Math.max(self.buffer.selectionStart, self.buffer.selectionEnd)
-                    };
+                    var currentlySelected = __getCaretPosition();
 
                     if (currentlySelected.from === currentlySelected.to) {
                         currentlySelected.to++;
@@ -338,9 +326,43 @@
                         charContainer.setAttribute("selected", true);
                     }
                 }, 0);
-            };
+            }
+
+            function __getCaretPosition() {
+                return {
+                    from: Math.min(self.buffer.selectionStart, self.buffer.selectionEnd),
+                    to: Math.max(self.buffer.selectionStart, self.buffer.selectionEnd)
+                };
+            }
+
+            // Attach Event Handlers --------------------------------------------------------------
+            this.display.addEventListener("mouseup", function() {
+                if (state.is_dragging) {
+                    __setCaretPosition(state.drag.from, state.drag.to);
+                } else {
+                    __setCaretPosition(self.buffer.value.length);
+                }
+                state.drag.from = null;
+                state.drag.to = null;
+                state.is_dragging = false;
+
+                __updateCaretPosition(self.buffer);
+
+                self.buffer.focus();
+            });
+
+            this.buffer.addEventListener("input", function(e) {
+                return __renderDisplay();
+            });
+
+            this.buffer.addEventListener("keydown", function(e) {
+                return __updateCaretPosition(self.buffer);
+            });
         }
 
-        var example = new Jsh().attachTo(document.body);
+        var example = new Jsh();
+        console.log(example);
+
+        example.attachTo(document.body);
     </script>
 </html>
