@@ -128,10 +128,18 @@
     <body>
     </body>
     <script>
-        function Terminal() {
+        function Jsh() {
             var self = this;
 
-            // Initialise Terminal Instance
+            var state = {
+                is_dragging: false,
+                drag: {
+                    from: null,
+                    to: null,
+                }
+            };
+
+            // Initialise Terminal ----------------------------------------------------------------
             this.buffer = document.createElement("textarea");
             this.buffer.setAttribute("class", "jsh-text-buffer");
 
@@ -173,24 +181,16 @@
                 return false;
             }
 
-            // Attach Event Handlers
-            var user = {
-                is_dragging: false,
-                drag: {
-                    from: null,
-                    to: null,
-                }
-            };
-
+            // Attach Event Handlers --------------------------------------------------------------
             this.display.addEventListener("mouseup", function() {
-                if (user.is_dragging) {
-                    __setCaretPosition(user.drag.from, user.drag.to);
+                if (state.is_dragging) {
+                    __setCaretPosition(state.drag.from, state.drag.to);
                 } else {
                     __setCaretPosition(self.buffer.value.length);
                 }
-                user.drag.from = null;
-                user.drag.to = null;
-                user.is_dragging = false;
+                state.drag.from = null;
+                state.drag.to = null;
+                state.is_dragging = false;
 
                 __updateCaretPosition(self.buffer);
 
@@ -215,7 +215,7 @@
                 return __updateCaretPosition(self.buffer);
             });
 
-            // Internal Functions
+            // Internal Functions -----------------------------------------------------------------
             function __isNewLine(char) {
                 return char.match("(\r)?\n");
             } 
@@ -234,14 +234,14 @@
 
                 // Drag handling - custom selection code
                 r.addEventListener("mousedown", function(e) {
-                    user.is_dragging = true;
-                    user.drag.from = index;
-                    user.drag.to = index;
+                    state.is_dragging = true;
+                    state.drag.from = index;
+                    state.drag.to = index;
                 });
 
                 r.addEventListener("mouseover", function(e) {
-                    if (user.is_dragging) {
-                        user.drag.to = index;
+                    if (state.is_dragging) {
+                        state.drag.to = index;
                     }
                 });
 
@@ -310,57 +310,37 @@
                         to: Math.max(self.buffer.selectionStart, self.buffer.selectionEnd)
                     };
 
+                    if (currentlySelected.from === currentlySelected.to) {
+                        currentlySelected.to++;
+                    }
+
                     var charContainer = self.container.querySelector(".jsh-display");
+                    var charElems = self.container.querySelectorAll(".jsh-char");
 
-                    if (currentlySelected.from >= 0 || currentlySelected.to >= 0) {
-                        charContainer.setAttribute("selected", false);
+                    if (charElems.length) {
+                        for (var i = 0; i < charElems.length; i++) {
+                            var index = parseInt(charElems[i].getAttribute("index"));
+                            charElems[i].setAttribute("selected", false);
 
-                        // If only one character is selected, we can rely on CSS selectors to do all the work
-                        if (currentlySelected.from === currentlySelected.to) {
-                            var charElem = self.container.querySelector(".jsh-char[index='" + (currentlySelected.from - 1) + "']");
+                            void charElems[i].offsetWidth; // Forces DOM to restart animations
 
-                            // If there isn't a charElem found, then the cursor must be either 0 or elem.length.
-                            if (charElem) {
-                                charContainer.setAttribute("selected", false);
-                                charElem.setAttribute("selected", true);
-                            } else {
-                                charContainer.setAttribute("selected", true);
-                            }
-
-                            var others = self.container.querySelectorAll(".jsh-char:not([index='" + (currentlySelected.from - 1) + "'])");
-                            if (others) {
-                                others.forEach(function(charElem) {
-                                    charElem.setAttribute("selected", false);
-                                });
+                            if (index >= currentlySelected.from - 1 && index < currentlySelected.to - 1) {
+                                charElems[i].setAttribute("selected", true);
                             }
                         }
+                    }
 
-                        // If there were multiple characters selected, we need to select them all and loop through them.
-                        else {
-                            var charElems = self.container.querySelectorAll(".jsh-char");
-                            if (charElems.length) {
-                                for (var i = 0; i < charElems.length; i++) {
-                                    var index = parseInt(charElems[i].getAttribute("index"));
+                    charContainer.setAttribute("selected", false);
 
-                                    if (index >= currentlySelected.from - 1 && index < currentlySelected.to - 1) {
-                                        charElems[i].setAttribute("selected", true);
-                                    } else {
-                                        charElems[i].setAttribute("selected", false);
-                                    }
-                                }
+                    void charContainer.offsetWidth; // Forces DOM to restart animations
 
-                                if (currentlySelected.from == 0) {
-                                    charContainer.setAttribute("selected", true);
-                                } else {
-                                    charContainer.setAttribute("selected", false);
-                                }
-                            }
-                        }
+                    if (currentlySelected.from === 0) {
+                        charContainer.setAttribute("selected", true);
                     }
                 }, 0);
             };
         }
 
-        var example = new Terminal().attachTo(document.body);
+        var example = new Jsh().attachTo(document.body);
     </script>
 </html>
