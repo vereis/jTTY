@@ -1,40 +1,19 @@
-# jsh
-A relatively function javaScript/jQuery terminal/shell.
+# jTTY
+A fun little 'tty' written in JavaScript and CSS with the goals of feeling like a native textarea, being extensible and not being over engineered.
 
-Currently supports:
-  - Caret movement
-  - Fully modular design
-  - Argument parsing ability
+Current Features:
+  - Terminal style caret which supports any (?) hotkeys supported in normal textareas on the web.
+  - The ability to move the caret by clicking on any characters
+  - Highlight select functionality.
 
+What's coming up?
+  1) Command parsing. Currently Jtty doesn't do anything functional as its base, Jsh, is being rewritten completely.
+  2) Some kind of standard set of commands
+  3) Custom commands and extensibility
+  
 How to use:
+  - Simply use the code in the script tags of 'rewrite_test.html' which allows you to construct a new jTTY object which can then be attached to any DOM nodes via jTTY.attachTo(node);
 
-  1) How to add new commands:
-      - Ensure that you add the new command to bin/
-      
-      - To enable it, in index.html, add it to the usable function list and
-        give it a help message.
-        
-      - Add an if/else check for the input and arguments in bin/REPL.js 
-      
-      - To enable a help argument, add a check for the argument and call
-        print(printHelp(arrayOfString))
-  
-  2) Folder Structure:
-      - Executable commands and the general workings of the terminal are
-        stored in bin/
-        
-      - JS for extra functionality (caret position and getting rss) will
-        be in lib/
-        
-      - Eventually custom style support will be added to styles/
-      
-      - Constants will be moved eventually to a properties.json
-      
-      
-  Please play around! :)
-  
-  Credits:
-     
-     -  windelicato; muhh inspirations
-    
-     -  feedEk for which my rss is based on
+Credits:
+  -  windelicato: for inspiring me to look at making my own JavaScript terminal in the same vein as his own. It is a shame his homepage is no longer accessible the last I checked.
+
