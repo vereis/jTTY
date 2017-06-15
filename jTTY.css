@@ -1,0 +1,118 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.jtty-term {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.jtty-text-buffer {
+    opacity: 0;
+    position: absolute;
+
+    /* If text in the text area wraps, it can make the display's up and down movements to appear 'off' */
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: scroll;
+
+    /* Testing */
+    /*opacity: 1;
+    left: 30em;
+    z-index: 1;*/
+}
+
+.jtty-display {
+    background-color: #222;
+    color: #FAFAFA;
+    font-family: monospace;
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    border: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
+
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    position: absolute;
+}
+
+.jtty-display .jtty-char {
+    position: relative;
+}
+
+.jtty-display .jtty-char .hidden {
+    color: transparent;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    height: 1px;
+}
+
+/* Caret Rendering CSS */
+.jtty-display[selected='true']:empty:after,
+.jtty-display[selected='true'] .jtty-char:first-child,
+.jtty-display[selected='true'] .jtty-char:not(:first-child)[selected='true'] + .jtty-char,
+.jtty-display[selected='true'] .jtty-char:first-child[selected='true'] + .jtty-char[selected='true'],
+.jtty-display:not([selected='true']) .jtty-char[selected='true'] + .jtty-char,
+.jtty-display .jtty-char:last-child[selected='true']:after {
+    outline: 1px solid #FAFAFA;
+    outline-offset: -1px;
+    content: " ";
+    animation: inherit;
+    -webkit-animation: inherit;
+}
+
+.jtty-text-buffer:focus + .jtty-display[selected='true']:empty:after,
+.jtty-text-buffer:focus + .jtty-display[selected='true'] .jtty-char:first-child,
+.jtty-text-buffer:focus + .jtty-display[selected='true'] .jtty-char:not(:first-child)[selected='true'] + .jtty-char,
+.jtty-text-buffer:focus + .jtty-display[selected='true'] .jtty-char:first-child[selected='true'] + .jtty-char[selected='true'],
+.jtty-text-buffer:focus + .jtty-display:not([selected='true']) .jtty-char[selected='true'] + .jtty-char,
+.jtty-text-buffer:focus + .jtty-display .jtty-char:last-child[selected='true']:after {
+    outline: none;
+    opacity: 1;
+    background-color: #FAFAFA;
+    color: #222;
+    animation: caret-animation 1s step-end infinite;
+    -webkit-animation: caret-animation 1s step-end infinite;
+}
+
+/* Selection CSS */
+.jtty-char[selected='true'] + .jtty-char[selected='true'],
+.jtty-char[selected='true'] + .jtty-char[selected='true'] + .jtty-char,
+.jtty-display[selected='true'] .jtty-char:first-child[selected='true'],
+.jtty-display ::selection {
+    outline: none;
+    background-color: rgba(200, 200, 200, 0.99);
+    color: #555;
+}
+
+@keyframes caret-animation {
+    50% {
+        background-color: #222;
+        color: #FAFAFA;
+    }
+}
+@-webkit-keyframes caret-animation {
+    50% {
+        background-color: #222;
+        color: #FAFAFA;
+    }
+}
