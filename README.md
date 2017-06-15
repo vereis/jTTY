@@ -21,11 +21,12 @@ Check out a live example [here](https://rawgit.com/vereis/jTTY/master/index.html
 ## Caveats:
 Right now, the way we're creating DOM Objects for each character is really slow and whilst it performs reasonably well on my dev machine on Chrome, it performs horribly on Firefox with as few as 15 characters. 
 
-## What's coming up?
-  1) Command parsing. Currently Jtty doesn't do anything functional as its base, Jsh, is being rewritten completely.
-  2) Some kind of standard set of commands
-  3) Custom commands and extensibility
-  4) Documentation.
+## What's coming up (In order of importance, in my opinion)?
+  1) Remove event handlers on individual characters and don't have spans for each one. Utilise Range to detect which character was clicked. Have caret as seperate element because the current way is hard to extend.
+  2) Command parsing. Currently Jtty doesn't do anything functional as its base, Jsh, is being rewritten completely.
+  3) Some kind of standard set of commands
+  4) Custom commands and extensibility
+  5) Documentation.
   
 ## How to use:
   - Simply add `jTTY.css` and `jTTY.js` to your webpage. This allows you to construct a new jTTY object.
