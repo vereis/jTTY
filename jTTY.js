@@ -1,5 +1,13 @@
 var jTTY = (function() {
-    var constructor = function(id) {
+
+    // Takes an options object. The options object currently supports the following options
+    // {
+    //     'enableCommands' : {
+    //         'key' : int || string,
+    //         'commands' : object<function_name, function>
+    //     }
+    // }
+    var constructor = function(id, options) {
         // Initialise Terminal ----------------------------------------------------------------
         var self = this;
 
@@ -14,6 +22,12 @@ var jTTY = (function() {
         this.id = id || __generateId();
 
         this.state = state;
+
+        this.commands = options && options.enableCommands && options.enableCommands.commands ? 
+            options.enableCommands.commands : {};
+
+        this.submitKey = options && options.enableCommands && options.enableCommands.key ? 
+            options.enableCommands.key : -1;
 
         // Create DOM Elements ----------------------------------------------------------------
         this.buffer = document.createElement("textarea");
@@ -51,6 +65,26 @@ var jTTY = (function() {
         });
 
         this.buffer.addEventListener("keydown", function(e) {
+            if (self.submitKey && (e.key === self.submitKey || e.keyCode === self.submitKey)) {
+                var userInput = self.getContents().split(" ");
+                var command = userInput[0];
+                var args = userInput.splice(1);
+
+                // Clear user input
+                self.deleteContents("");
+                self.setCaretPos(0, 0);
+
+                // Perform function if possible
+                if (self.commands[command]) {
+                    self.commands[command].apply(self, args);
+                }
+                else {
+                    console.log("No function by the name '" + command + "' found.");
+                }
+
+                e.preventDefault();
+            }
+
             return __updateCaretPosition(self.buffer);
         });
 
