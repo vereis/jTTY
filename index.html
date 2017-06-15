@@ -13,6 +13,15 @@
     <body>
     </body>
     <script>
-        new jTTY().attach(document.body);
+        var tty = new jTTY("test", {
+            'enableCommands': {
+                'key': 'Enter',
+                'commands': {
+                    "echo": function() {
+                        console.log.apply(tty, arguments);
+                    }
+                }
+            }
+        }).attach(document.body);
     </script>
 </html>
